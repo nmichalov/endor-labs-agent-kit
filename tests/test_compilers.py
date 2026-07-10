@@ -418,7 +418,7 @@ def _prompt_budget(relative_path: str) -> int:
         return 14_000
     if agent_id in {"dependency-decision-helper", "package-risk-summary"}:
         return 13_000
-    if agent_id in {"cicd-posture", "endor-troubleshooter", "probe-droid"}:
+    if agent_id in {"cicd-posture", "endor-troubleshooter", "probe-droid", "ai-sast-dynamic-validation"}:
         return 25_000
     if agent_id in {"sca-remediation", "ai-sast-triage"}:
         return 35_000

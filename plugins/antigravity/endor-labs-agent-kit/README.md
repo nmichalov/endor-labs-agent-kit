@@ -61,6 +61,7 @@ package managers.
 
 | Job | Antigravity skill | Antigravity subagent | Safety |
 | --- | --- | --- | --- |
+| Ai Sast Dynamic Validation | `ai-sast-dynamic-validation` | `@ai-sast-dynamic-validation` | read-only |
 | Triage AI SAST findings | `ai-sast-triage` | `@ai-sast-triage` | mutating, approval-gated |
 | Assess CI/CD and supply chain posture | `cicd-posture` | `@cicd-posture` | read-only |
 | Dependency Decision Helper | `dependency-decision-helper` | `@dependency-decision-helper` | read-only |

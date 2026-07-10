@@ -76,6 +76,7 @@ package managers.
 
 | Job | Claude Code agent | Safety |
 | --- | --- | --- |
+| Ai Sast Dynamic Validation | `ai-sast-dynamic-validation` | read-only |
 | Triage AI SAST findings | `ai-sast-triage` | mutating, approval-gated |
 | Assess CI/CD and supply chain posture | `cicd-posture` | read-only |
 | Decide whether a dependency is safe to use | `dependency-decision-helper` | read-only |

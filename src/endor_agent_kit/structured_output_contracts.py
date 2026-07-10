@@ -16,6 +16,16 @@ class StructuredOutputField:
 
 
 STRUCTURED_OUTPUT_CONTRACTS: dict[str, tuple[StructuredOutputField, ...]] = {
+    "ai-sast-dynamic-validation": (
+        StructuredOutputField("run_verdict", "enum"),
+        StructuredOutputField("summary", "string"),
+        StructuredOutputField("project_resolution", "object"),
+        StructuredOutputField("validation_target", "object"),
+        StructuredOutputField("evidence_queries", "list[object]"),
+        StructuredOutputField("verdicts", "list[object]"),
+        StructuredOutputField("recommended_next_steps", "list[object]"),
+        StructuredOutputField("data_gaps", "list[string]"),
+    ),
     "ai-sast-triage": (
         StructuredOutputField("summary", "string"),
         StructuredOutputField("project_resolution", "object"),

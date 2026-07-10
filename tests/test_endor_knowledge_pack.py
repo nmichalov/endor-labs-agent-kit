@@ -57,6 +57,7 @@ def test_knowledge_pack_loader_exposes_precedence_and_global_rules():
         "version-upgrade-summary",
     ]
     assert set(pack.workflows) == {
+        "ai-sast-dynamic-validation",
         "ai-sast-triage",
         "cicd-posture",
         "dependency-decision-helper",

@@ -15,6 +15,7 @@ Generated for Endor Labs Agent Kit Codex plugin `endor-labs-agent-kit` v2.1.0.
 
 ## Bundled Codex Agents And Skills
 
+- `ai-sast-dynamic-validation` -> `endor-ai-sast-dynamic-validation-agent`
 - `ai-sast-triage` -> `endor-ai-sast-triage-agent`
 - `cicd-posture` -> `endor-cicd-posture-agent`
 - `dependency-decision-helper` -> `endor-dependency-decision-helper-agent`

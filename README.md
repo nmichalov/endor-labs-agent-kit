@@ -112,6 +112,7 @@ The SDK package includes `cursor-sdk/agent_definitions.json`, generated prompt f
 
 | Agent | What it does | Invoke | Safety | First prompt |
 | --- | --- | --- | --- | --- |
+| 🧪 AI SAST Dynamic Validation | Validate Endor AI SAST findings by safely replaying exploit-reproduction proofs against a running instance of the target app | `endor-ai-sast-dynamic-validation-agent` | `read-only` | `Validate the AI SAST findings for this repository against my running app at <target_base_url>. I authorize testing this target. Do not send any request without confirming that authorization first.` |
 | 🔎 AI SAST Triage | Triage Endor AI SAST findings, use exploit and remediation context, and open requested change requests | `endor-ai-sast-triage-agent` | `approval-gated mutating` | `Triage AI SAST findings for this repository. Do not edit files, open a PR/MR, create a ticket, or write an Endor policy until I approve the specific gate.` |
 | 🧭 CI/CD And Supply Chain Posture | Assess CI/CD and supply chain posture from existing Endor findings and read-only GitHub configuration evidence | `endor-cicd-posture-agent` | `read-only` | `Assess CI/CD and supply chain posture for namespace <namespace>. Keep it read-only and validate the deterministic score.` |
 | ⚖️ Dependency Decision Helper | Decide whether to add, upgrade to, or keep a specific package version | `endor-dependency-decision-helper-agent` | `read-only` | `Assess whether we should use npm lodash version 4.17.20. Keep it read-only.` |
@@ -177,6 +178,7 @@ You only need `source/agents/` when you are changing or contributing an agent.
 
 | Agent | Use it when you want to... | Claude Code | Claude Managed Agents | Codex | Gemini | Cursor | Cursor SDK | Portable |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| AI SAST Dynamic Validation | Validate Endor AI SAST findings by safely replaying exploit-reproduction proofs against a running instance of the target app | `claude-code/ai-sast-dynamic-validation/` | `claude-managed-agents/ai-sast-dynamic-validation/` | `codex/ai-sast-dynamic-validation/` | `gemini/ai-sast-dynamic-validation/` | `agents/endor-ai-sast-dynamic-validation-agent.md` + `skills/ai-sast-dynamic-validation/` | `cursor-sdk/agents/endor-ai-sast-dynamic-validation-agent.md` | `portable/ai-sast-dynamic-validation/` |
 | AI SAST Triage | Triage Endor AI SAST findings, use exploit and remediation context, and open requested change requests | `claude-code/ai-sast-triage/` | - | `codex/ai-sast-triage/` | `gemini/ai-sast-triage/` | `agents/endor-ai-sast-triage-agent.md` + `skills/ai-sast-triage/` | `cursor-sdk/agents/endor-ai-sast-triage-agent.md` | `portable/ai-sast-triage/` |
 | CI/CD And Supply Chain Posture | Assess CI/CD and supply chain posture from existing Endor findings and read-only GitHub configuration evidence | `claude-code/cicd-posture/` | `claude-managed-agents/cicd-posture/` | `codex/cicd-posture/` | `gemini/cicd-posture/` | `agents/endor-cicd-posture-agent.md` + `skills/cicd-posture/` | `cursor-sdk/agents/endor-cicd-posture-agent.md` | `portable/cicd-posture/` |
 | Dependency Decision Helper | Decide whether to add, upgrade to, or keep a specific package version | `claude-code/dependency-decision-helper/` | `claude-managed-agents/dependency-decision-helper/` | `codex/dependency-decision-helper/` | `gemini/dependency-decision-helper/` | `agents/endor-dependency-decision-helper-agent.md` + `skills/dependency-decision-helper/` | `cursor-sdk/agents/endor-dependency-decision-helper-agent.md` | `portable/dependency-decision-helper/` |
@@ -455,6 +457,8 @@ start a new Codex session so the skill loader can see it.
 
 ```bash
 mkdir -p "$HOME/.agents/skills"
+cp -R /path/to/endor-labs-agent-kit/codex/ai-sast-dynamic-validation \
+  "$HOME/.agents/skills/ai-sast-dynamic-validation"
 cp -R /path/to/endor-labs-agent-kit/codex/ai-sast-triage \
   "$HOME/.agents/skills/ai-sast-triage"
 cp -R /path/to/endor-labs-agent-kit/codex/cicd-posture \
@@ -486,6 +490,7 @@ cp -R /path/to/endor-labs-agent-kit/codex/sca-remediation \
 Then invoke it from Codex:
 
 ```text
+Use the ai-sast-dynamic-validation skill to help with this Endor Labs workflow.
 Use the ai-sast-triage skill to triage AI SAST findings for this repository.
 Use the cicd-posture skill to assess CI/CD and supply chain posture for namespace <namespace>.
 Use the dependency-decision-helper skill to help with this Endor Labs workflow.
@@ -528,6 +533,12 @@ For cloud agents, pass `--mode cloud --repo-url <repo-url> --ref <branch>`.
 | Endor policy-write access | AI SAST Triage standalone exceptions | Required only when a verified AppSec PR/MR approval should create a scoped Endor exception policy. The agent must show the policy spec and ask for confirmation before writing. |
 
 ## Example Prompts
+
+AI SAST Dynamic Validation:
+
+```text
+@agent-ai-sast-dynamic-validation validate the AI SAST findings against my running app at http://localhost:8080; I authorize testing this target
+```
 
 AI SAST Triage:
 

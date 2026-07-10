@@ -69,6 +69,7 @@ not run scans, run `endorctl host-check`, edit shell profiles, install
 | Job | Codex skill | Codex custom agent | Safety |
 | --- | --- | --- | --- |
 | Set up this machine | `endor-agent-kit-setup` | `endor-agent-kit-setup-agent` | read-only setup |
+| Ai Sast Dynamic Validation | `ai-sast-dynamic-validation` | `endor-ai-sast-dynamic-validation-agent` | read-only |
 | Triage AI SAST findings | `ai-sast-triage` | `endor-ai-sast-triage-agent` | mutating, approval-gated |
 | Assess CI/CD and supply chain posture | `cicd-posture` | `endor-cicd-posture-agent` | read-only |
 | Dependency Decision Helper | `dependency-decision-helper` | `endor-dependency-decision-helper-agent` | read-only |

@@ -956,6 +956,7 @@ def _cursor_agent_name(agent_id: str) -> str:
 
 def _agent_summary(agent_id: str) -> str:
     summaries = {
+        "ai-sast-dynamic-validation": "Validate Endor AI SAST findings by safely replaying exploit-reproduction proofs against a running instance of the target app",
         "ai-sast-triage": "Triage Endor AI SAST findings, use exploit and remediation context, and open requested change requests",
         "cicd-posture": "Assess CI/CD and supply chain posture from existing Endor findings and read-only GitHub configuration evidence",
         "dependency-decision-helper": "Decide whether to add, upgrade to, or keep a specific package version",
@@ -974,6 +975,7 @@ def _agent_summary(agent_id: str) -> str:
 
 def _agent_icon(agent_id: str) -> str:
     icons = {
+        "ai-sast-dynamic-validation": "🧪",
         "ai-sast-triage": "🔎",
         "cicd-posture": "🧭",
         "dependency-decision-helper": "⚖️",
@@ -1005,6 +1007,7 @@ def _agent_safety(agent_id: str) -> str:
 
 def _agent_first_prompt(agent_id: str) -> str:
     prompts = {
+        "ai-sast-dynamic-validation": "Validate the AI SAST findings for this repository against my running app at <target_base_url>. I authorize testing this target. Do not send any request without confirming that authorization first.",
         "ai-sast-triage": "Triage AI SAST findings for this repository. Do not edit files, open a PR/MR, create a ticket, or write an Endor policy until I approve the specific gate.",
         "cicd-posture": "Assess CI/CD and supply chain posture for namespace <namespace>. Keep it read-only and validate the deterministic score.",
         "dependency-decision-helper": "Assess whether we should use npm lodash version 4.17.20. Keep it read-only.",
@@ -1023,6 +1026,7 @@ def _agent_first_prompt(agent_id: str) -> str:
 
 def _agent_example(agent_id: str) -> str:
     examples = {
+        "ai-sast-dynamic-validation": "@agent-ai-sast-dynamic-validation validate the AI SAST findings against my running app at http://localhost:8080; I authorize testing this target",
         "ai-sast-triage": "@agent-ai-sast-triage triage AI SAST findings for this repository",
         "cicd-posture": "@agent-cicd-posture assess CI/CD and supply chain posture for namespace <namespace>",
         "dependency-decision-helper": "@agent-dependency-decision-helper assess npm lodash version 4.17.20",

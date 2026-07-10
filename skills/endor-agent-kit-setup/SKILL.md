@@ -12,6 +12,7 @@ Generated for the Endor Labs Agent Kit Cursor package.
 
 ## Bundled Cursor Workflows
 
+- `Ai Sast Dynamic Validation` -> skill `ai-sast-dynamic-validation`
 - `Triage AI SAST findings` -> skill `ai-sast-triage`
 - `Assess CI/CD and supply chain posture` -> skill `cicd-posture`
 - `Dependency Decision Helper` -> skill `dependency-decision-helper`

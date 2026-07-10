@@ -16,6 +16,7 @@ Generated for the Endor Labs Agent Kit Claude Code plugin.
 
 ## Bundled Claude Code Agents
 
+- `Ai Sast Dynamic Validation` -> Claude Code agent `ai-sast-dynamic-validation`
 - `Triage AI SAST findings` -> Claude Code agent `ai-sast-triage`
 - `Assess CI/CD and supply chain posture` -> Claude Code agent `cicd-posture`
 - `Decide whether a dependency is safe to use` -> Claude Code agent `dependency-decision-helper`

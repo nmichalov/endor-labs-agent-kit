@@ -5,6 +5,53 @@
       "authors": [
         "Endor Labs"
       ],
+      "description": "Use this agent when the user wants to confirm whether Endor AI SAST findings\nare actually exploitable by safely replaying each finding's non-destructive\nExploit Reproduction proof-of-concept against a running instance of the\ntarget web app. The agent parses Endor's AI SAST case file, statically lints\nthe embedded proof-of-concept for destructive patterns, retargets it to a\nuser-authorized base URL only, executes bounded read-only probes, and\nclassifies each finding as dynamically confirmed, not reproducible, blocked\nby a control, or inconclusive. It never mutates the repository, the Endor\ntenant, or the target application, and it never sends a single request\nwithout explicit current-turn authorization.\n",
+      "editions": [
+        {
+          "artifacts": [
+            {
+              "bytes": 2188,
+              "path": "claude-code/ai-sast-dynamic-validation/README.md",
+              "sha256": "46e892295798f8d0a870d4811f5863233725cd8a4c837a0545f0333129c9c5ac"
+            },
+            {
+              "bytes": 36586,
+              "path": "claude-code/ai-sast-dynamic-validation/ai-sast-dynamic-validation.md",
+              "sha256": "605e0eebebc9ac59589175fb2169361314264522e1ba4af58d9535f01c43cf4d"
+            },
+            {
+              "bytes": 9206,
+              "path": "claude-code/ai-sast-dynamic-validation/architecture.svg",
+              "sha256": "27d52d619fea85a8ac052262b2c4e6e491607c15792b152c0d9cbb8a831eecda"
+            },
+            {
+              "bytes": 1487,
+              "path": "claude-code/ai-sast-dynamic-validation/endorctl-setup.md",
+              "sha256": "27f98e86626d23f2d647b203248c0ff7a2c3721a96c6531003e62bb26c74908c"
+            }
+          ],
+          "id": "enterprise-edition",
+          "name": "Enterprise Edition",
+          "path": "claude-code/ai-sast-dynamic-validation",
+          "requires_endorctl": ">=1.0.0"
+        }
+      ],
+      "host": "claude-code",
+      "id": "ai-sast-dynamic-validation",
+      "name": "AI SAST Dynamic Validation",
+      "requires_endorctl": ">=1.0.0",
+      "short_description": "Validates Endor AI SAST findings by safely replaying exploit-reproduction proofs against a running instance of the target app.",
+      "source": {
+        "builder_recipe": "source/agents/ai-sast-dynamic-validation/recipe.yaml",
+        "recipe_schema_version": 1
+      },
+      "version": "0.1.0"
+    },
+    {
+      "audience": "appsec",
+      "authors": [
+        "Endor Labs"
+      ],
       "description": "Parse Endor AI SAST findings, use exploit reproduction and remediation guidance as patch context, fetch source at the pinned commit, and open change requests when requested.",
       "editions": [
         {
@@ -596,6 +643,63 @@
       "authors": [
         "Endor Labs"
       ],
+      "description": "Use this agent when the user wants to confirm whether Endor AI SAST findings\nare actually exploitable by safely replaying each finding's non-destructive\nExploit Reproduction proof-of-concept against a running instance of the\ntarget web app. The agent parses Endor's AI SAST case file, statically lints\nthe embedded proof-of-concept for destructive patterns, retargets it to a\nuser-authorized base URL only, executes bounded read-only probes, and\nclassifies each finding as dynamically confirmed, not reproducible, blocked\nby a control, or inconclusive. It never mutates the repository, the Endor\ntenant, or the target application, and it never sends a single request\nwithout explicit current-turn authorization.\n",
+      "editions": [
+        {
+          "artifacts": [
+            {
+              "bytes": 2643,
+              "path": "claude-managed-agents/ai-sast-dynamic-validation/README.md",
+              "sha256": "8868f90ae86509d53a3e581975792c2c6a8ecf8ae6d49c084a7e5b6ae5ac0eae"
+            },
+            {
+              "bytes": 37732,
+              "path": "claude-managed-agents/ai-sast-dynamic-validation/agent.yaml",
+              "sha256": "39951975be5730af6a4b613544ff98b20e94bd45591b2d8acc4a7177621d01f5"
+            },
+            {
+              "bytes": 9206,
+              "path": "claude-managed-agents/ai-sast-dynamic-validation/architecture.svg",
+              "sha256": "27d52d619fea85a8ac052262b2c4e6e491607c15792b152c0d9cbb8a831eecda"
+            },
+            {
+              "bytes": 1487,
+              "path": "claude-managed-agents/ai-sast-dynamic-validation/endorctl-setup.md",
+              "sha256": "27f98e86626d23f2d647b203248c0ff7a2c3721a96c6531003e62bb26c74908c"
+            },
+            {
+              "bytes": 242,
+              "path": "claude-managed-agents/ai-sast-dynamic-validation/environment.yaml",
+              "sha256": "9727cf36bc5561234cac44885f09c712ede5585ca8960926bd740441de17ce89"
+            },
+            {
+              "bytes": 51,
+              "path": "claude-managed-agents/ai-sast-dynamic-validation/session-template.yaml",
+              "sha256": "a8c802876a05c84101970bf28f3c1eb38824a90f74872df81a966e59df8f44b0"
+            }
+          ],
+          "id": "enterprise-edition",
+          "name": "Enterprise Edition",
+          "path": "claude-managed-agents/ai-sast-dynamic-validation",
+          "requires_endorctl": ">=1.0.0"
+        }
+      ],
+      "host": "claude-managed-agents",
+      "id": "ai-sast-dynamic-validation",
+      "name": "AI SAST Dynamic Validation",
+      "requires_endorctl": ">=1.0.0",
+      "short_description": "Validates Endor AI SAST findings by safely replaying exploit-reproduction proofs against a running instance of the target app.",
+      "source": {
+        "builder_recipe": "source/agents/ai-sast-dynamic-validation/recipe.yaml",
+        "recipe_schema_version": 1
+      },
+      "version": "0.1.0"
+    },
+    {
+      "audience": "appsec",
+      "authors": [
+        "Endor Labs"
+      ],
       "description": "Use this agent when the user wants a read-only CI/CD and supply chain\nposture assessment for an Endor namespace, GitHub organization, repository\nset, or current repository. The agent combines existing Endor SCPM, CI/CD,\nGitHub Actions, and supply-chain findings with read-only GitHub configuration\nevidence and optional local CI file inspection, then returns deterministic\nscores, critical overrides, evidence queries, and data gaps without mutating\nEndor, GitHub, or repository state.\n",
       "editions": [
         {
@@ -1083,6 +1187,53 @@
         "recipe_schema_version": 1
       },
       "version": "1.0.0"
+    },
+    {
+      "audience": "appsec",
+      "authors": [
+        "Endor Labs"
+      ],
+      "description": "Use this agent when the user wants to confirm whether Endor AI SAST findings\nare actually exploitable by safely replaying each finding's non-destructive\nExploit Reproduction proof-of-concept against a running instance of the\ntarget web app. The agent parses Endor's AI SAST case file, statically lints\nthe embedded proof-of-concept for destructive patterns, retargets it to a\nuser-authorized base URL only, executes bounded read-only probes, and\nclassifies each finding as dynamically confirmed, not reproducible, blocked\nby a control, or inconclusive. It never mutates the repository, the Endor\ntenant, or the target application, and it never sends a single request\nwithout explicit current-turn authorization.\n",
+      "editions": [
+        {
+          "artifacts": [
+            {
+              "bytes": 2722,
+              "path": "codex/ai-sast-dynamic-validation/README.md",
+              "sha256": "bdafa6413cdde913a8f244913bfe906db243bf075016c5e845125295badff2ee"
+            },
+            {
+              "bytes": 37268,
+              "path": "codex/ai-sast-dynamic-validation/SKILL.md",
+              "sha256": "29aaf12a20a426b277a32bdd108a1cb024adbf5b4c5ceebd3c1e7532bb806862"
+            },
+            {
+              "bytes": 9206,
+              "path": "codex/ai-sast-dynamic-validation/architecture.svg",
+              "sha256": "27d52d619fea85a8ac052262b2c4e6e491607c15792b152c0d9cbb8a831eecda"
+            },
+            {
+              "bytes": 1487,
+              "path": "codex/ai-sast-dynamic-validation/endorctl-setup.md",
+              "sha256": "27f98e86626d23f2d647b203248c0ff7a2c3721a96c6531003e62bb26c74908c"
+            }
+          ],
+          "id": "codex-skill",
+          "name": "Codex Skill",
+          "path": "codex/ai-sast-dynamic-validation",
+          "requires_endorctl": ">=1.0.0"
+        }
+      ],
+      "host": "codex",
+      "id": "ai-sast-dynamic-validation",
+      "name": "AI SAST Dynamic Validation",
+      "requires_endorctl": ">=1.0.0",
+      "short_description": "Validates Endor AI SAST findings by safely replaying exploit-reproduction proofs against a running instance of the target app.",
+      "source": {
+        "builder_recipe": "source/agents/ai-sast-dynamic-validation/recipe.yaml",
+        "recipe_schema_version": 1
+      },
+      "version": "0.1.0"
     },
     {
       "audience": "appsec",
@@ -1674,6 +1825,58 @@
         "recipe_schema_version": 1
       },
       "version": "1.0.0"
+    },
+    {
+      "audience": "appsec",
+      "authors": [
+        "Endor Labs"
+      ],
+      "description": "Use this agent when the user wants to confirm whether Endor AI SAST findings\nare actually exploitable by safely replaying each finding's non-destructive\nExploit Reproduction proof-of-concept against a running instance of the\ntarget web app. The agent parses Endor's AI SAST case file, statically lints\nthe embedded proof-of-concept for destructive patterns, retargets it to a\nuser-authorized base URL only, executes bounded read-only probes, and\nclassifies each finding as dynamically confirmed, not reproducible, blocked\nby a control, or inconclusive. It never mutates the repository, the Endor\ntenant, or the target application, and it never sends a single request\nwithout explicit current-turn authorization.\n",
+      "editions": [
+        {
+          "artifacts": [
+            {
+              "bytes": 2947,
+              "path": "gemini/ai-sast-dynamic-validation/README.md",
+              "sha256": "729a1842825a1e57644ff03211f097b70fc8448fdbac5555700d220bd4c7128a"
+            },
+            {
+              "bytes": 37297,
+              "path": "gemini/ai-sast-dynamic-validation/SKILL.md",
+              "sha256": "2c319500cdbabcce6c68c5ad88d0bd5b4e9d7235795ada5352e60daa909a04fb"
+            },
+            {
+              "bytes": 37558,
+              "path": "gemini/ai-sast-dynamic-validation/ai-sast-dynamic-validation.md",
+              "sha256": "0d234d1ecd320efb5c8f9ae05e09dbd502d92d77cb686bcf9571335659936925"
+            },
+            {
+              "bytes": 9206,
+              "path": "gemini/ai-sast-dynamic-validation/architecture.svg",
+              "sha256": "27d52d619fea85a8ac052262b2c4e6e491607c15792b152c0d9cbb8a831eecda"
+            },
+            {
+              "bytes": 1487,
+              "path": "gemini/ai-sast-dynamic-validation/endorctl-setup.md",
+              "sha256": "27f98e86626d23f2d647b203248c0ff7a2c3721a96c6531003e62bb26c74908c"
+            }
+          ],
+          "id": "gemini-cli",
+          "name": "Gemini CLI Skill And Subagent",
+          "path": "gemini/ai-sast-dynamic-validation",
+          "requires_endorctl": ">=1.0.0"
+        }
+      ],
+      "host": "gemini",
+      "id": "ai-sast-dynamic-validation",
+      "name": "AI SAST Dynamic Validation",
+      "requires_endorctl": ">=1.0.0",
+      "short_description": "Validates Endor AI SAST findings by safely replaying exploit-reproduction proofs against a running instance of the target app.",
+      "source": {
+        "builder_recipe": "source/agents/ai-sast-dynamic-validation/recipe.yaml",
+        "recipe_schema_version": 1
+      },
+      "version": "0.1.0"
     },
     {
       "audience": "appsec",
@@ -2330,6 +2533,63 @@
         "recipe_schema_version": 1
       },
       "version": "1.0.0"
+    },
+    {
+      "audience": "appsec",
+      "authors": [
+        "Endor Labs"
+      ],
+      "description": "Use this agent when the user wants to confirm whether Endor AI SAST findings\nare actually exploitable by safely replaying each finding's non-destructive\nExploit Reproduction proof-of-concept against a running instance of the\ntarget web app. The agent parses Endor's AI SAST case file, statically lints\nthe embedded proof-of-concept for destructive patterns, retargets it to a\nuser-authorized base URL only, executes bounded read-only probes, and\nclassifies each finding as dynamically confirmed, not reproducible, blocked\nby a control, or inconclusive. It never mutates the repository, the Endor\ntenant, or the target application, and it never sends a single request\nwithout explicit current-turn authorization.\n",
+      "editions": [
+        {
+          "artifacts": [
+            {
+              "bytes": 5883,
+              "path": "portable/ai-sast-dynamic-validation/README.md",
+              "sha256": "1cee8b31cf833f7f00d36270fa1a8f93e3bb4f424e0d9ac9fb4a6e73f9b8b24f"
+            },
+            {
+              "bytes": 13645,
+              "path": "portable/ai-sast-dynamic-validation/agent.manifest.json",
+              "sha256": "37e466297eed34a95eae70e4acf7f5cc37a0ac33554a668249be44f9c6d6cf49"
+            },
+            {
+              "bytes": 33515,
+              "path": "portable/ai-sast-dynamic-validation/agent.md",
+              "sha256": "309623f15e7aa3f95d19582f71e77276d19e7105e04f30b8ca9f9f69533c4169"
+            },
+            {
+              "bytes": 9206,
+              "path": "portable/ai-sast-dynamic-validation/architecture.svg",
+              "sha256": "27d52d619fea85a8ac052262b2c4e6e491607c15792b152c0d9cbb8a831eecda"
+            },
+            {
+              "bytes": 1487,
+              "path": "portable/ai-sast-dynamic-validation/endorctl-setup.md",
+              "sha256": "27f98e86626d23f2d647b203248c0ff7a2c3721a96c6531003e62bb26c74908c"
+            },
+            {
+              "bytes": 5994,
+              "path": "portable/ai-sast-dynamic-validation/output-contract.md",
+              "sha256": "8ca2ccdf4df80eb2e0010f9d53094e18572daba20bc210cc944dad4880f8d3d8"
+            }
+          ],
+          "id": "portable-agent",
+          "name": "Portable Agent Bundle",
+          "path": "portable/ai-sast-dynamic-validation",
+          "requires_endorctl": ">=1.0.0"
+        }
+      ],
+      "host": "portable",
+      "id": "ai-sast-dynamic-validation",
+      "name": "AI SAST Dynamic Validation",
+      "requires_endorctl": ">=1.0.0",
+      "short_description": "Validates Endor AI SAST findings by safely replaying exploit-reproduction proofs against a running instance of the target app.",
+      "source": {
+        "builder_recipe": "source/agents/ai-sast-dynamic-validation/recipe.yaml",
+        "recipe_schema_version": 1
+      },
+      "version": "0.1.0"
     },
     {
       "audience": "appsec",
@@ -3058,9 +3318,14 @@
     {
       "artifacts": [
         {
-          "bytes": 5276,
+          "bytes": 5382,
           "path": "plugins/antigravity/endor-labs-agent-kit/README.md",
-          "sha256": "288288d5f97e02948d1d05e2addbfb752182a7b4319d02d6e9c167e1b3baf7cc"
+          "sha256": "1008386eef9cdd1c41b775de0325f0c7ac0df977977b563aabedf56e8088e249"
+        },
+        {
+          "bytes": 23019,
+          "path": "plugins/antigravity/endor-labs-agent-kit/agents/ai-sast-dynamic-validation.md",
+          "sha256": "de565030429a9a2da88e56f8e78875779ad08869517436e52882069689e17613"
         },
         {
           "bytes": 28757,
@@ -3158,6 +3423,11 @@
           "sha256": "5fca4ea1623d6cf6d4d797760bf9d8c1cbc6a58668df9bb8fc91744c3407729d"
         },
         {
+          "bytes": 22753,
+          "path": "plugins/antigravity/endor-labs-agent-kit/skills/ai-sast-dynamic-validation/SKILL.md",
+          "sha256": "5a236d27015d45844786a092b8d80aa3a40dda786a1fafc59fbf30c5313ea000"
+        },
+        {
           "bytes": 28458,
           "path": "plugins/antigravity/endor-labs-agent-kit/skills/ai-sast-triage/SKILL.md",
           "sha256": "5e34fe3b53c2bf190582058a280344c0871f77854f17ebf7e199af4819cbcc9b"
@@ -3173,9 +3443,9 @@
           "sha256": "89eff3ffe9ebeb3e93066ebbccca287c24c1570737f4227163b74fbdd7c6eee2"
         },
         {
-          "bytes": 10099,
+          "bytes": 10208,
           "path": "plugins/antigravity/endor-labs-agent-kit/skills/endor-agent-kit-setup/SKILL.md",
-          "sha256": "b71af9853bb5825414e2c5e5d0227c27c6a25f1da47a2a7472910bdb502b6e79"
+          "sha256": "0228858439968321df65e51f8c67f46a86a08868b354f99f7bb75734a229e31c"
         },
         {
           "bytes": 23794,
@@ -3236,6 +3506,7 @@
       "display_name": "Endor Labs Agent Kit",
       "host": "antigravity",
       "included_agents": [
+        "ai-sast-dynamic-validation",
         "ai-sast-triage",
         "cicd-posture",
         "dependency-decision-helper",
@@ -3262,9 +3533,14 @@
           "sha256": "76d4dd973a6fd8f28c28eed70f6f011c9f1111b5d8301b5d4cf5570553e06b2a"
         },
         {
-          "bytes": 5572,
+          "bytes": 5646,
           "path": "plugins/claude/ai-plugins/README.md",
-          "sha256": "1c3f6d6687cb21e5ab01f2c8ab8bff0d360bd2682870dbcf0368fa55fa10a7ba"
+          "sha256": "73cc8328a424b2b87996a0d24ae41d44fd63ff4cbc3b235753e229cb77d65419"
+        },
+        {
+          "bytes": 22162,
+          "path": "plugins/claude/ai-plugins/agents/ai-sast-dynamic-validation.md",
+          "sha256": "2128e3eeb3c7d1fde2ef653fe8cd6b07c2d7a494fe32908d591001fcd63aafef"
         },
         {
           "bytes": 27765,
@@ -3337,9 +3613,9 @@
           "sha256": "3bc1cce0aa35f12d7de7c537726305f6125692ef5f147774abd683a7b269917e"
         },
         {
-          "bytes": 10056,
+          "bytes": 10137,
           "path": "plugins/claude/ai-plugins/skills/endor-agent-kit-setup/SKILL.md",
-          "sha256": "1491f5e0a1bb2f20e76977f1f39c007aadf2adb5e832089612f8febe07b37446"
+          "sha256": "e7cec9cbdc44e0b49330d13e9041146bee523b1e6e35201d0763b2e3c042e98c"
         },
         {
           "bytes": 1933,
@@ -3360,6 +3636,7 @@
       "display_name": "Endor Labs AI Plugins (Legacy)",
       "host": "claude-code",
       "included_agents": [
+        "ai-sast-dynamic-validation",
         "ai-sast-triage",
         "cicd-posture",
         "dependency-decision-helper",
@@ -3387,9 +3664,14 @@
           "sha256": "a28db83a078567fd6a4671e51259324756eb49b772710cbc2265869e1d744cf8"
         },
         {
-          "bytes": 5591,
+          "bytes": 5665,
           "path": "plugins/claude/endor-labs-agent-kit/README.md",
-          "sha256": "c6f850bdf8b26114bddc75c7e09bb3ba951e8746c6ed029ce53543aceed56649"
+          "sha256": "74a4adedc5d49c9b1aac7b19382fcafa562d9eef171df56196bef827b11227d2"
+        },
+        {
+          "bytes": 22162,
+          "path": "plugins/claude/endor-labs-agent-kit/agents/ai-sast-dynamic-validation.md",
+          "sha256": "2128e3eeb3c7d1fde2ef653fe8cd6b07c2d7a494fe32908d591001fcd63aafef"
         },
         {
           "bytes": 27765,
@@ -3482,9 +3764,9 @@
           "sha256": "cf0b22a7cdf01d9c3a6c93132f78cf1cffb14f1c26b0fa85c423c12b1267fbdd"
         },
         {
-          "bytes": 10020,
+          "bytes": 10101,
           "path": "plugins/claude/endor-labs-agent-kit/skills/endor-agent-kit-setup/SKILL.md",
-          "sha256": "010ffbea195a80485f7472354d7c48c559877db22070c383a46b284783b2512b"
+          "sha256": "cc307b1f096672e3aa9f5bcd299d2979bd5beaaafe8c1c19405ef54b1777472f"
         },
         {
           "bytes": 1933,
@@ -3505,6 +3787,7 @@
       "display_name": "Endor Labs Agent Kit",
       "host": "claude-code",
       "included_agents": [
+        "ai-sast-dynamic-validation",
         "ai-sast-triage",
         "cicd-posture",
         "dependency-decision-helper",
@@ -3532,14 +3815,19 @@
           "sha256": "3a6d20f82fe497d283669fc48e0501c84b4d835af8b60716d665ae66d210e769"
         },
         {
-          "bytes": 5825,
+          "bytes": 5942,
           "path": "plugins/codex/endor-labs-agent-kit/README.md",
-          "sha256": "d80973a8a6ec6d8cbab616c0cb7874ba68ccca8da79d41b66f77332bda9eec30"
+          "sha256": "9c92ed6fd3c6fa04643bdc7374fa620c5faf41d51687040623bd21cd3d69c843"
         },
         {
-          "bytes": 4070,
+          "bytes": 4098,
           "path": "plugins/codex/endor-labs-agent-kit/agents/endor-agent-kit-setup-agent.toml",
-          "sha256": "d5146336cd48710820f53a241edd1f6cfd02db3b26d89b7098d8effc76fe7027"
+          "sha256": "56f180df971cd73bd4c122a50328dff32bdefbd39de0d8ba5266c3d72f9d99e0"
+        },
+        {
+          "bytes": 23033,
+          "path": "plugins/codex/endor-labs-agent-kit/agents/endor-ai-sast-dynamic-validation-agent.toml",
+          "sha256": "7972f6e7dc1a87745f1b72df4aa8ef146e3efc68db75f4d7901434328f413ce8"
         },
         {
           "bytes": 28439,
@@ -3637,6 +3925,11 @@
           "sha256": "4b06af01a069172ff62a702c5dcec3188ef98fb959a09ba8ddae7f0c0666eea9"
         },
         {
+          "bytes": 22226,
+          "path": "plugins/codex/endor-labs-agent-kit/skills/ai-sast-dynamic-validation/SKILL.md",
+          "sha256": "90624ae599b0e3a9d1c5aafe56d542e157e873ac39c7df9028e6bf4bbef0e940"
+        },
+        {
           "bytes": 27710,
           "path": "plugins/codex/endor-labs-agent-kit/skills/ai-sast-triage/SKILL.md",
           "sha256": "c5b2a5b037e1de0c0405eee1f1ea6eec09f378028ebb645843a3c66427ff3a1a"
@@ -3652,9 +3945,9 @@
           "sha256": "5e4aa21bf3507baa046533237aea00d002043ff4c638f66f0dfec570fbf3dc5b"
         },
         {
-          "bytes": 10383,
+          "bytes": 10458,
           "path": "plugins/codex/endor-labs-agent-kit/skills/endor-agent-kit-setup/SKILL.md",
-          "sha256": "a896e8bdc19db905174a09b81d23cdbe1a14e67bbe1d8cb01cfeedea6f0aabfb"
+          "sha256": "39e8c9a7d94b04fab4d7758ff5ae0a8875f514650eb1eb7e82e1df2733e95cdd"
         },
         {
           "bytes": 23267,
@@ -3725,6 +4018,7 @@
       "display_name": "Endor Labs Agent Kit",
       "host": "codex",
       "included_agents": [
+        "ai-sast-dynamic-validation",
         "ai-sast-triage",
         "cicd-posture",
         "dependency-decision-helper",
@@ -3757,9 +4051,14 @@
           "sha256": "bbbadfe7f4caa43188321791fc7d3f6a73cc0ea06e88c8c7186fad2671f3040c"
         },
         {
-          "bytes": 9780,
+          "bytes": 9900,
           "path": "agents/endor-agent-kit-setup-agent.md",
-          "sha256": "b9babd5698193376bf674c8ac29743632bc40d3b3a28a6e2138be23803352047"
+          "sha256": "3f36bb18dbffc873f7e3459da823b7d592dce2fa7ca767f04a108723a13e2197"
+        },
+        {
+          "bytes": 23020,
+          "path": "agents/endor-ai-sast-dynamic-validation-agent.md",
+          "sha256": "22f6303ed7b9846a1e2daa18c92389cb67a8766ac530b9b3b9d0f77347e85ca2"
         },
         {
           "bytes": 28690,
@@ -3852,6 +4151,16 @@
           "sha256": "cf0b22a7cdf01d9c3a6c93132f78cf1cffb14f1c26b0fa85c423c12b1267fbdd"
         },
         {
+          "bytes": 22703,
+          "path": "skills/ai-sast-dynamic-validation/SKILL.md",
+          "sha256": "eeb5dc058d5c3ae2bfcd84c516e39cc0c0cdabd10a4ec650e8779dc44dfd9090"
+        },
+        {
+          "bytes": 9206,
+          "path": "skills/ai-sast-dynamic-validation/architecture.svg",
+          "sha256": "27d52d619fea85a8ac052262b2c4e6e491607c15792b152c0d9cbb8a831eecda"
+        },
+        {
           "bytes": 28396,
           "path": "skills/ai-sast-triage/SKILL.md",
           "sha256": "086e9ba47152abc0d307c537ede5a481e287a60f62ac480efa7d6f3be89ab1f7"
@@ -3882,9 +4191,9 @@
           "sha256": "6e53579c9748c80c2dbf9cbd33f3e3d4859f7d423349ea6fb7d0181d41b2ec78"
         },
         {
-          "bytes": 9219,
+          "bytes": 9288,
           "path": "skills/endor-agent-kit-setup/SKILL.md",
-          "sha256": "7ff54328c842493be1e0c3c8add24689ba0e509dac9c6199fb6b3838f92f96f2"
+          "sha256": "e8844ddb1937bab79c82010ad9998d76edd5da497c44906cc4759f0b76eb260d"
         },
         {
           "bytes": 23738,
@@ -3980,6 +4289,7 @@
       "display_name": "Endor Labs Agent Kit",
       "host": "cursor",
       "included_agents": [
+        "ai-sast-dynamic-validation",
         "ai-sast-triage",
         "cicd-posture",
         "dependency-decision-helper",
@@ -4002,19 +4312,29 @@
     {
       "artifacts": [
         {
-          "bytes": 8017,
+          "bytes": 8819,
           "path": "cursor-sdk/README.md",
-          "sha256": "a12c9cfd658e652bc78f279bb8fca3531f53ed8521a5c7b198bae9234bec1032"
+          "sha256": "9258bd9cb39a3778b9bd577e73467cacc9bb715c8f6b0376ba6c642486dfbe10"
         },
         {
-          "bytes": 10637,
+          "bytes": 11756,
           "path": "cursor-sdk/agent_definitions.json",
-          "sha256": "a7481ba7303c233a3a7b53f7d19766853cfb37619966cf4c72dcbf56a45d6a56"
+          "sha256": "38ec65d9de3ced7274f7e1170416419aa2cea18a82b6ebff3b53eb403a79a60e"
         },
         {
-          "bytes": 9054,
+          "bytes": 9139,
           "path": "cursor-sdk/agents/endor-agent-kit-setup-agent.md",
-          "sha256": "fb65abaacaa443e904b546852ab8c2ed2d6bcaf5ce33dbce6773f080da5ed6cc"
+          "sha256": "3835b926ee64bf02e5396de909c10f2a1c70ab474b6d0fba6de6dee8dccecd2d"
+        },
+        {
+          "bytes": 9206,
+          "path": "cursor-sdk/agents/endor-ai-sast-dynamic-validation-agent.architecture.svg",
+          "sha256": "27d52d619fea85a8ac052262b2c4e6e491607c15792b152c0d9cbb8a831eecda"
+        },
+        {
+          "bytes": 21965,
+          "path": "cursor-sdk/agents/endor-ai-sast-dynamic-validation-agent.md",
+          "sha256": "1e20df6b54ad595516835cdb55445dcf2fbf9b747b6ce66a0be68a9a2ed7b39b"
         },
         {
           "bytes": 6454,
@@ -4150,6 +4470,7 @@
       "display_name": "Endor Labs Agent Kit Cursor SDK",
       "host": "cursor-sdk",
       "included_agents": [
+        "ai-sast-dynamic-validation",
         "ai-sast-triage",
         "cicd-posture",
         "dependency-decision-helper",
@@ -4171,14 +4492,19 @@
     {
       "artifacts": [
         {
-          "bytes": 1750,
+          "bytes": 1862,
           "path": "plugins/gemini/endor-labs-agent-kit/GEMINI.md",
-          "sha256": "8a678809911c707bf7b1b33109bdc83cb5f545728319c082b248c1d9661051d4"
+          "sha256": "0cf0bf28a4f3fbaa2f1c1729abbff86e7e207d71cf9f2cd25fc3f270da346364"
         },
         {
-          "bytes": 5594,
+          "bytes": 5700,
           "path": "plugins/gemini/endor-labs-agent-kit/README.md",
-          "sha256": "5ef3810ebb430d673d5ab563c6b52226e61aac33f50b22f60b265b85cd299d60"
+          "sha256": "caecd14b501eee62efc17531fa23b9ce674bbaa8f83e9f71d417c3dd84feafdf"
+        },
+        {
+          "bytes": 22720,
+          "path": "plugins/gemini/endor-labs-agent-kit/agents/ai-sast-dynamic-validation.md",
+          "sha256": "5889a60142e23bc72e4e7ac166c1cfc0f9c41fddf60cbf6e3c6c30b4e17828b3"
         },
         {
           "bytes": 28458,
@@ -4276,6 +4602,11 @@
           "sha256": "cf0b22a7cdf01d9c3a6c93132f78cf1cffb14f1c26b0fa85c423c12b1267fbdd"
         },
         {
+          "bytes": 22459,
+          "path": "plugins/gemini/endor-labs-agent-kit/skills/ai-sast-dynamic-validation/SKILL.md",
+          "sha256": "20e029a3238df5369d0a80393108af4d6718085443f5bb8a0c137e9366476122"
+        },
+        {
           "bytes": 28164,
           "path": "plugins/gemini/endor-labs-agent-kit/skills/ai-sast-triage/SKILL.md",
           "sha256": "6ed95bdb89f69fa719ef9c2be3f38a481e0954380cf43540c5d4209be3d1ee66"
@@ -4291,9 +4622,9 @@
           "sha256": "b8417b342de3911433b602e65263be43ad0fbc98b08a5c4867047601db367143"
         },
         {
-          "bytes": 10218,
+          "bytes": 10327,
           "path": "plugins/gemini/endor-labs-agent-kit/skills/endor-agent-kit-setup/SKILL.md",
-          "sha256": "7ab9b38cf589f2cf4eb008f684f98692b454160edaf59010f9ea574ceb1bc23f"
+          "sha256": "bd0dedeae4e46a2e0b142b9919451039be2893ce7fdbcbcc62aaa2e9c1cd361c"
         },
         {
           "bytes": 23500,
@@ -4354,6 +4685,7 @@
       "display_name": "Endor Labs Agent Kit",
       "host": "gemini",
       "included_agents": [
+        "ai-sast-dynamic-validation",
         "ai-sast-triage",
         "cicd-posture",
         "dependency-decision-helper",

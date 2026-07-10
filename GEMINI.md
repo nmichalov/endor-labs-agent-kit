@@ -20,6 +20,7 @@ before live Endor work.
 
 User jobs mapped to root skills:
 
+- Ai Sast Dynamic Validation: use skill `ai-sast-dynamic-validation`.
 - Triage AI SAST findings: use skill `ai-sast-triage`.
 - Assess CI/CD and supply chain posture: use skill `cicd-posture`.
 - Dependency Decision Helper: use skill `dependency-decision-helper`.

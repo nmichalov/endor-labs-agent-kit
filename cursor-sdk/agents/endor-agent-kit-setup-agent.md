@@ -7,6 +7,7 @@ Generated for Cursor Python SDK automation.
 
 ## Bundled Cursor SDK Workflows
 
+- `Ai Sast Dynamic Validation` -> SDK agent `endor-ai-sast-dynamic-validation-agent`
 - `Triage AI SAST findings` -> SDK agent `endor-ai-sast-triage-agent`
 - `Assess CI/CD and supply chain posture` -> SDK agent `endor-cicd-posture-agent`
 - `Dependency Decision Helper` -> SDK agent `endor-dependency-decision-helper-agent`

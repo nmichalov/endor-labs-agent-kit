@@ -2,6 +2,28 @@
   "schema_version": "v1",
   "agents": [
     {
+      "id": "ai-sast-dynamic-validation",
+      "name": "AI SAST Dynamic Validation",
+      "audience": "appsec",
+      "short_description": "Validates Endor AI SAST findings by safely replaying exploit-reproduction proofs against a running instance of the target app.",
+      "description": "Use this agent when the user wants to confirm whether Endor AI SAST findings\nare actually exploitable by safely replaying each finding's non-destructive\nExploit Reproduction proof-of-concept against a running instance of the\ntarget web app. The agent parses Endor's AI SAST case file, statically lints\nthe embedded proof-of-concept for destructive patterns, retargets it to a\nuser-authorized base URL only, executes bounded read-only probes, and\nclassifies each finding as dynamically confirmed, not reproducible, blocked\nby a control, or inconclusive. It never mutates the repository, the Endor\ntenant, or the target application, and it never sends a single request\nwithout explicit current-turn authorization.\n",
+      "endorctl_min_version": "1.0.0",
+      "version": "0.1.0",
+      "authors": [
+        "Endor Labs"
+      ],
+      "install": [
+        {
+          "host": "claude-code",
+          "command": "mkdir -p .claude/agents && cp claude-code/ai-sast-dynamic-validation/ai-sast-dynamic-validation.md .claude/agents/ai-sast-dynamic-validation.md"
+        },
+        {
+          "host": "claude-managed",
+          "command": "cd claude-managed-agents/ai-sast-dynamic-validation && ant beta:agents create < agent.yaml && ant beta:environments create < environment.yaml"
+        }
+      ]
+    },
+    {
       "id": "ai-sast-triage",
       "name": "AI SAST Triage",
       "audience": "appsec",

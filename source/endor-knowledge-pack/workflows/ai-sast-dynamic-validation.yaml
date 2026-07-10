@@ -1,0 +1,195 @@
+agent_id: ai-sast-dynamic-validation
+title: AI SAST Dynamic Validation Evidence Contract
+summary: Use namespace-scoped main-context AI SAST findings and their parsed Exploit Reproduction evidence to decide
+  eligibility before any authorized live probe of a running target.
+task_profiles:
+  - id: resolve-scope
+    title: Resolve Scope
+    summary: Prove namespace, repository, project, and AI SAST finding scope only; never touch the live target here.
+    when_to_use:
+      - The user gives a repository or finding reference and asks what Endor scope applies.
+      - A validation run would be premature without resolved project and finding scope.
+    minimal_evidence:
+      - Repository identity, namespace provenance, Project lookup, and any supplied finding UUID selector.
+    stop_when:
+      - Project and finding scope are resolved or blocked with precise data_gaps.
+      - Do not parse Exploit Reproduction detail or contact any live target in this profile.
+    output_focus:
+      - Return project resolution, finding selector attempts, evidence_queries, and data_gaps.
+  - id: evidence-check
+    title: Evidence Check
+    summary: Fetch AI SAST finding detail and parse Exploit Reproduction structure to decide dynamic-validation eligibility.
+    when_to_use:
+      - The user asks whether a finding can be dynamically validated before naming a target.
+      - A read-only eligibility check needs evidence discipline without sending any request.
+    minimal_evidence:
+      - Resolved Project, main-context AI SAST Finding detail, parsed Exploit Reproduction sections, and safety-lint status of any embedded reproduction script.
+    stop_when:
+      - Eligibility and safety-lint status are known for every candidate finding.
+      - Do not send a request to any target in this profile.
+    output_focus:
+      - Return per-finding eligibility, safety-lint outcome, evidence_queries, and data_gaps for missing script or reproduction detail.
+  - id: validation-plan
+    title: Validation Plan
+    summary: Decide whether to execute or only plan a bounded, retargeted probe once authorization and safety-lint evidence are both verified.
+    when_to_use:
+      - The user supplies a target_base_url and authorization_confirmed and asks for dynamic validation.
+      - The finding passed eligibility and the safety lint in the evidence-check profile.
+    minimal_evidence:
+      - Verified current-turn authorization, safety-lint pass, retargeted request plan scoped to one host, and bounded request budget.
+    stop_when:
+      - A dynamic_classification is recorded for every eligible finding, or the run is blocked with a precise reason.
+      - Do not expand probing beyond the parsed script's exact method/path pairs or beyond one authorized host.
+    output_focus:
+      - Return run_verdict, per-finding verdicts, probe_plan or probe_results, evidence_queries, and data_gaps.
+resources:
+  - name: Project
+    purpose: Resolve the Endor project and repository identity from namespace-scoped metadata.
+    fields:
+      - uuid
+      - meta.name
+      - meta.parent_uuid
+      - spec.git
+  - name: Finding
+    purpose: Query AI SAST findings with source context, severity, and the Exploit Reproduction case-file text.
+    fields:
+      - uuid
+      - context.type
+      - spec.project_uuid
+      - spec.method
+      - spec.source_code_version
+      - spec.finding_metadata
+      - spec.explanation
+retrieval_steps:
+  - Inspect supplied context manifests or local `.endorlabs-context` snapshots before live Endor lookups and confirm namespace,
+    project UUID, and finding UUID freshness.
+  - Resolve project identity from repository metadata, then query `Finding` with `context.type==CONTEXT_TYPE_MAIN`,
+    `spec.project_uuid`, and `spec.method=="SYSTEM_EVALUATION_METHOD_DEFINITION_AI_SAST"` by default.
+  - Parse Exploit Reproduction structure (Exploit Path, Impact, Steps to Reproduce, reproduction script, Concrete Values) before deciding
+    eligibility; never contact a live target until authorization and the safety lint both pass.
+  - Redact concrete exploit strings and live response content from review-facing output; keep exact evidence in internal
+    reasoning only.
+fallbacks:
+  - If project or finding lookup fails, retry eligible project discovery with traversal and keep source findings separate
+    from PR or CI context.
+  - If a finding has no parseable reproduction script or Concrete Values, mark it ineligible with a precise reason instead of
+    inventing a probe.
+data_gaps:
+  - Record missing credentials, namespace conflicts, project lookup gaps, absent finding evidence, unparseable Exploit
+    Reproduction sections, missing authorization, and unreachable targets in `data_gaps`.
+  - Preserve `namespace_provenance`, finding UUID, and target authorization state across evidence-check and validation-plan
+    outputs.
+  - Final JSON fields must use concise evidence summaries, not raw `endorctl api`, `curl`, `git`, or shell pipeline
+    strings. Keep exact commands in tool execution only.
+evidence_query_plans:
+  - profile_id: resolve-scope
+    title: AI SAST Dynamic Validation Scope Query Plan
+    objective: Resolve namespace, project, and finding selector before reading finding bodies or parsing reproduction detail.
+    query_order:
+      - Read user-provided finding UUID allow-list, repository identity, branch/ref, and namespace provenance.
+      - Resolve Project by scoped repository selector when a project is not already proven.
+    avoid:
+      - Do not list broad AI SAST findings across unrelated projects.
+      - Do not parse Exploit Reproduction detail before scope is resolved.
+    stop_after:
+      - Stop when finding scope is resolved or a data_gaps entry explains which selector is missing.
+    data_gaps:
+      - Record missing namespace, missing finding selector, and unresolved project in data_gaps.
+  - profile_id: evidence-check
+    title: AI SAST Dynamic Validation Evidence Query Plan
+    objective: Confirm AI SAST evidence, parse Exploit Reproduction, and lint any embedded reproduction script without contacting a live target.
+    query_order:
+      - Resolve project and namespace first.
+      - List main-context AI SAST findings for the resolved project with metadata-only fields, then fetch full detail only
+        for candidate findings whose classification and severity make them plausible dynamic-validation targets.
+      - Parse Exploit Reproduction structure and run the destructive-pattern safety lint on any reproduction script found.
+    avoid:
+      - Do not fetch unrelated SAST finding bodies.
+      - Do not send any request to a live target in this profile.
+    stop_after:
+      - Stop after every candidate finding has an eligibility and safety-lint outcome.
+    data_gaps:
+      - Record missing finding body, unparseable Exploit Reproduction sections, missing reproduction script, and failed safety-lint
+        findings in data_gaps.
+  - profile_id: validation-plan
+    title: AI SAST Dynamic Validation Probe Query Plan
+    objective: Retarget an eligible, lint-passed finding's script to one authorized host and record a bounded probe plan or result.
+    query_order:
+      - Verify current-turn authorization_confirmed and target_base_url before building any retargeted request.
+      - Rewrite only scheme/host/port to target_base_url; preserve path, method, query, and body from Concrete Values.
+      - Execute within max_requests_per_finding, or record the plan only when dry_run is set or authorization is missing.
+    avoid:
+      - Do not contact any host other than target_base_url.
+      - Do not exceed the configured request budget or retry indefinitely.
+    stop_after:
+      - Stop after a dynamic_classification or a precise block reason is recorded for every eligible finding.
+    data_gaps:
+      - Record missing authorization, unreachable target, ambiguous response signal, and any extra-host reference found in
+        evidence in data_gaps.
+evidence_query_recipes:
+  - profile_id: resolve-scope
+    id: project-by-git
+    canonical_id: project-by-git
+    resource: Project
+    purpose: Resolve the current repository to a namespace-scoped Endor project with only identity fields.
+    template: endorctl api list -r Project -n <namespace> --filter 'spec.git.full_name=="<owner/repo>"' --field-mask "uuid,meta.name,meta.parent_uuid,spec.git"
+      --list-all -o json
+    fields:
+      - uuid
+      - meta.name
+      - meta.parent_uuid
+      - spec.git
+    constraints:
+      - Use the namespace selected by the preflight.
+      - Retry with --traverse only for the same proven namespace before reporting data_gaps.
+  - profile_id: evidence-check
+    id: ai-sast-list
+    canonical_id: ai-sast-list
+    resource: Finding
+    purpose: List only AI SAST finding availability for a resolved project when no Finding UUID was supplied.
+    template: endorctl api list -r Finding -n <namespace> --filter 'context.type==CONTEXT_TYPE_MAIN and spec.project_uuid=="<PROJECT_UUID>"
+      and spec.method=="SYSTEM_EVALUATION_METHOD_DEFINITION_AI_SAST"' --field-mask "uuid,context.type,spec.project_uuid,spec.method,spec.source_code_version,spec.finding_metadata"
+      --list-all -o json
+    fields:
+      - uuid
+      - context.type
+      - spec.project_uuid
+      - spec.method
+      - spec.source_code_version
+      - spec.finding_metadata
+    constraints:
+      - Prefer finding-by-uuid when supplied.
+      - Do not include spec.explanation in complete list queries; fetch it only for candidate findings.
+      - Use `SYSTEM_EVALUATION_METHOD_DEFINITION_AI_SAST`; do not use shorthand method values or finding-tags selectors.
+  - profile_id: evidence-check
+    id: finding-by-uuid
+    canonical_id: finding-by-uuid
+    resource: Finding
+    purpose: Fetch one known Finding by UUID to parse Exploit Reproduction detail; api get does not accept filters.
+    template: endorctl api get -r Finding -n <namespace> --uuid <FINDING_UUID> -o json
+    fields:
+      - uuid
+      - context.type
+      - spec.project_uuid
+      - spec.source_code_version
+      - spec.finding_metadata
+      - spec.explanation
+    constraints:
+      - Do not use --filter with api get.
+      - After get, report context.type and source ref before treating the finding as main-context evidence.
+  - profile_id: validation-plan
+    id: selected-ai-sast-finding
+    canonical_id: finding-by-uuid
+    resource: Finding
+    purpose: Re-fetch one eligible Finding by UUID immediately before building its retargeted probe plan.
+    template: endorctl api get -r Finding -n <namespace> --uuid <FINDING_UUID> -o json
+    fields:
+      - uuid
+      - context.type
+      - spec.project_uuid
+      - spec.source_code_version
+      - spec.finding_metadata
+      - spec.explanation
+    constraints:
+      - Do not use --filter with api get.
+      - Re-verify safety-lint status from this fetch before executing any probe.

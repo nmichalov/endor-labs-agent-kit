@@ -9,6 +9,7 @@ Generated for the Endor Labs Agent Kit Gemini CLI extension.
 
 ## Bundled Gemini CLI Workflows
 
+- `Ai Sast Dynamic Validation` -> skill `ai-sast-dynamic-validation`, subagent `@ai-sast-dynamic-validation`
 - `Triage AI SAST findings` -> skill `ai-sast-triage`, subagent `@ai-sast-triage`
 - `Assess CI/CD and supply chain posture` -> skill `cicd-posture`, subagent `@cicd-posture`
 - `Dependency Decision Helper` -> skill `dependency-decision-helper`, subagent `@dependency-decision-helper`
