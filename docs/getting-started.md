@@ -94,6 +94,7 @@ package managers, or write credentials.
 
 | Job | Workflow |
 | --- | --- |
+| Validate Endor AI SAST findings against a running instance of the app | `ai-sast-dynamic-validation` |
 | Triage Endor AI SAST findings | `ai-sast-triage` |
 | Assess CI/CD and supply chain posture | `cicd-posture` |
 | Diagnose Endor setup, scan, auth, policy, or integration issues | `endor-troubleshooter` |
@@ -109,6 +110,10 @@ Each workflow above is generated for the supported host packages. Use the
 selected host README for exact invocation names and install paths.
 
 ## First Prompts
+
+```text
+Use the ai-sast-dynamic-validation skill to validate the AI SAST findings for this repository against my running app at <target_base_url>. I authorize testing this target. Do not send any request without confirming that authorization first.
+```
 
 ```text
 Use the ai-sast-triage skill to triage AI SAST findings for this repository. Do not edit files, open a PR/MR, or create an Endor policy unless I approve the specific gate.

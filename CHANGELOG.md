@@ -11,6 +11,15 @@ package metadata.
 
 ## Unreleased
 
+### Added
+
+- Added the read-only `ai-sast-dynamic-validation` source agent for confirming
+  Endor AI SAST findings by safely replaying each finding's non-destructive
+  Exploit Reproduction proof-of-concept against a running instance of the
+  target app, under a current-turn authorization gate and a defense-in-depth
+  safety lint, across Claude Code, Claude Managed Agents, Codex, Gemini,
+  Portable, Cursor, and Cursor SDK surfaces.
+
 ## 2.1.0 - 2026-06-16
 
 ### Added
