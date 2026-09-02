@@ -4,7 +4,7 @@
 #
 # No private key is stored anywhere: CI authenticates to Azure via OIDC federation
 # (azure/login) and the key never leaves the HSM. The Key Vault key + federation are
-# provisioned under AI-418; this script runs only when CATALOG_SIGNING_ENABLED=true.
+# provisioned for release signing; this script runs only when CATALOG_SIGNING_ENABLED=true.
 # See RELEASES.md.
 set -euo pipefail
 
@@ -13,15 +13,29 @@ signature="${2:-catalog.json.sig}"
 : "${CATALOG_SIGNING_VAULT:?set CATALOG_SIGNING_VAULT (Azure Key Vault name)}"
 : "${CATALOG_SIGNING_KEY:?set CATALOG_SIGNING_KEY (Key Vault key name)}"
 
-# AKV signs a precomputed digest; ES256 takes the SHA-256 digest as base64url (unpadded).
-digest_b64url="$(openssl dgst -sha256 -binary "$catalog" | basenc --base64url | tr -d '=')"
+# AKV signs a precomputed digest. `az keyvault key sign` decodes --digest with
+# standard base64 (base64.b64decode), which drops base64url's -/_, so encode the
+# SHA-256 digest as standard padded base64 to keep all 32 bytes intact.
+digest_b64="$(openssl dgst -sha256 -binary "$catalog" | python -c '
+import sys
+from endor_agent_kit.catalog_signing import akv_digest_arg
+sys.stdout.write(akv_digest_arg(sys.stdin.buffer.read()))
+')"
 
+# `az keyvault key sign` returns the signature under `signature` (encrypt/decrypt
+# use `result`, sign/verify do not).
 raw_b64url="$(az keyvault key sign \
   --vault-name "$CATALOG_SIGNING_VAULT" \
   --name "$CATALOG_SIGNING_KEY" \
   --algorithm ES256 \
-  --digest "$digest_b64url" \
-  --query 'result' -o tsv)"
+  --digest "$digest_b64" \
+  --query 'signature' -o tsv)"
+
+# Fail loudly here rather than let an empty value surface as an opaque length error downstream.
+if [ -z "$raw_b64url" ]; then
+  echo "az keyvault key sign returned no signature (check --query field and key permissions)" >&2
+  exit 1
+fi
 
 # AKV returns a raw P1363 (r||s) signature; convert to DER for the pinned-public-key
 # verifiers (openssl dgst -verify, apiserver ecdsa.VerifyASN1).

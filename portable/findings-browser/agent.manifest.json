@@ -4,6 +4,7 @@
     "actions": null,
     "agent": "agent.md",
     "architecture": "architecture.svg",
+    "artifact_summarizer": "runtime/summarize_endor_artifact.py",
     "output_contract": "output-contract.md",
     "runtime_contract": "agent.manifest.json",
     "runtime_setup": "endorctl-setup.md"
@@ -15,8 +16,8 @@
     "mutation_without_adapter": "forbidden",
     "supports_plan_only": true
   },
-  "description": "Use this agent when the user wants to browse, filter, summarize, or inspect\nexisting Endor Labs findings. Findings Browser uses read-only Endor evidence\nto list matching findings, explain applied filters, surface pagination and\ntruncation limits, and identify data gaps without starting new scans or\nperforming remediation actions.\n",
-  "endorctl_api_invocations": [
+  "description": "Browses, filters, and summarizes existing Endor findings without starting\nnew scans or performing remediation. It shows the applied scope and filters,\nrelevant severity and reachability context, pagination or truncation limits,\nand any evidence gaps affecting the results.\n",
+  "endorctl_agent_api_invocations": [
     "resolve_project_or_repository_selector",
     "get_finding_by_uuid",
     "list_findings_by_scope_and_filters",
@@ -25,6 +26,12 @@
   "generated_files_are_editable": false,
   "id": "findings-browser",
   "inputs": [
+    {
+      "description": "Optional trusted Agent Policy Pack context supplied by runtime or protected workspace configuration.",
+      "kind": "object",
+      "name": "policy_pack",
+      "required": false
+    },
     {
       "description": "Optional Endor namespace. The artifact uses the configured namespace when omitted.",
       "kind": "string",
@@ -98,6 +105,12 @@
       "required": false
     },
     {
+      "description": "Optional Endor FINDING_TAGS_* prioritization tags such as FINDING_TAGS_EXPLOITED, FINDING_TAGS_FIX_AVAILABLE, or FINDING_TAGS_REACHABLE_FUNCTION for exploit-first triage.",
+      "kind": "list[string]",
+      "name": "tag_filter",
+      "required": false
+    },
+    {
       "description": "Maximum finding rows to return. Defaults to 25 and should remain bounded.",
       "kind": "integer",
       "name": "page_size",
@@ -149,7 +162,7 @@
       "required": true
     },
     {
-      "description": "Read-only or future workflow suggestions such as vulnerability-explainer, sca-remediation, probe-droid, or cicd-posture, with confirmation requirements for any mutating follow-up.",
+      "description": "Read-only or future workflow suggestions such as vulnerability-explainer, sca-remediation, configuration-automation, or cicd-posture, with confirmation requirements for any mutating follow-up.",
       "kind": "list[object]",
       "name": "recommended_next_steps",
       "required": true
@@ -165,12 +178,25 @@
       "kind": "list[string]",
       "name": "data_gaps",
       "required": true
+    },
+    {
+      "description": "Trusted policy pack status, id, version, SHA-256, and source. Use not_configured when no policy pack is active.",
+      "kind": "object",
+      "name": "policy_context",
+      "required": true
+    },
+    {
+      "description": "Applicable policy decisions with policy id, effect, decision, message, facts used, and missing facts.",
+      "kind": "list[object]",
+      "name": "policy_evaluations",
+      "required": true
     }
   ],
   "portable_schema_version": 1,
   "recipe_schema_version": 1,
   "required_capabilities": [
-    "endor.query"
+    "endor.query",
+    "organization.policy.evaluate"
   ],
   "required_endor_mcp_tools": [],
   "required_runtime_controls": [
@@ -232,6 +258,14 @@
       ]
     },
     {
+      "description": "Load trusted policy packs, return policy evaluation evidence, and deny mutating actions when policies block or require unverified review.",
+      "id": "policy_enforcement",
+      "required_for": [
+        "policy_actions",
+        "mutating_actions"
+      ]
+    },
+    {
       "description": "Perform duplicate-prevention lookups before creating or reusing external state when an action contract requires it.",
       "id": "idempotency_check",
       "required_for": [
@@ -240,10 +274,10 @@
     }
   ],
   "required_transports": [
-    "endorctl_api"
+    "endorctl_agent_api"
   ],
   "requires_endor_mcp": "",
-  "requires_endorctl": ">=1.0.0",
+  "requires_endorctl": ">=1.7.1088",
   "runtime_action_vocabulary": [
     {
       "confirmation_required": false,
@@ -251,8 +285,7 @@
       "description": "Run read-only Endor evidence lookups through an approved Endor transport.",
       "kind": "endor.query",
       "provider_examples": [
-        "endor-api",
-        "endorctl-api",
+        "endorctl-agent-api",
         "approved-endor-mcp-adapter"
       ],
       "status": "declared"
@@ -345,13 +378,24 @@
       "status": "unavailable"
     },
     {
+      "confirmation_required": false,
+      "declared_by_recipe": true,
+      "description": "Evaluate trusted organization policy packs before recommendations or mutating workflow gates proceed.",
+      "kind": "organization.policy.evaluate",
+      "provider_examples": [
+        "policy-pack",
+        "policy-service",
+        "runtime-policy-engine"
+      ],
+      "status": "declared"
+    },
+    {
       "confirmation_required": null,
       "declared_by_recipe": false,
-      "description": "Create or reuse an Endor policy only after required approval and confirmation.",
+      "description": "Create, update, or reuse an Endor Policy only after required approval and confirmation; delete and non-Policy mutations are forbidden.",
       "kind": "endor.policy.write",
       "provider_examples": [
-        "endor-api",
-        "endorctl-api"
+        "endorctl-agent-api"
       ],
       "status": "unavailable"
     },

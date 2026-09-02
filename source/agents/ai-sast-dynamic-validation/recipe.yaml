@@ -1,6 +1,7 @@
 recipe_schema_version: 1
 id: ai-sast-dynamic-validation
 name: AI SAST Dynamic Validation
+category: Research & Investigate
 version: 0.1.0
 description: |
   Use this agent when the user wants to confirm whether Endor AI SAST findings

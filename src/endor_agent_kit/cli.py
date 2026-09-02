@@ -31,6 +31,17 @@ from endor_agent_kit.install import (
     check_portable_install,
 )
 from endor_agent_kit.lifecycle import prepare_validation_request, validation_request_summary
+from endor_agent_kit.policy_pack import (
+    evaluate_policy_pack,
+    evaluate_policy_pack_file,
+    evaluations_to_json,
+    load_policy_pack,
+    PolicyPackLoadError,
+    policy_fact_preflight_errors,
+    validate_policy_pack_data,
+    validate_policy_pack_file,
+)
+from endor_agent_kit.profile_contracts import compile_profile_contract
 from endor_agent_kit.portable_runtime_conformance import adapter_response_conformance_errors
 from endor_agent_kit.provenance import build_provenance_statement, verify_catalog_provenance
 from endor_agent_kit.publisher import publish_recipes
@@ -154,6 +165,26 @@ def main(argv: list[str] | None = None) -> int:
     )
     validate_adapter_response_parser.add_argument("response", type=Path)
 
+    validate_policy_pack_parser = subparsers.add_parser(
+        "validate-policy-pack",
+        help="Validate a declarative Agent Kit policy pack",
+    )
+    validate_policy_pack_parser.add_argument("policy_pack", type=Path)
+
+    evaluate_policy_pack_parser = subparsers.add_parser(
+        "evaluate-policy-pack",
+        help="Evaluate a policy pack against a JSON fact bag",
+    )
+    evaluate_policy_pack_parser.add_argument("policy_pack", type=Path)
+    evaluate_policy_pack_parser.add_argument("--facts", type=Path, required=True)
+    evaluate_policy_pack_parser.add_argument("--agent", default="")
+    evaluate_policy_pack_parser.add_argument("--ecosystem", default="")
+    evaluate_policy_pack_parser.add_argument(
+        "--preflight",
+        action="store_true",
+        help="Require trusted scope and applicability facts before evaluation",
+    )
+
     structured_output_schema_parser = subparsers.add_parser(
         "structured-output-schema",
         help="Print the provider-neutral JSON Schema for an agent final output",
@@ -162,6 +193,10 @@ def main(argv: list[str] | None = None) -> int:
         "--agent",
         required=True,
         choices=known_structured_agent_ids(),
+    )
+    structured_output_schema_parser.add_argument(
+        "--task-profile",
+        help="Project the logical schema to one source-defined task profile",
     )
 
     verify_provenance_parser = subparsers.add_parser(
@@ -229,6 +264,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Print the SLSA-style in-toto provenance statement for the catalog",
     )
     provenance_statement_parser.add_argument("--catalog-root", default=Path("."), type=Path)
+    provenance_statement_parser.add_argument(
+        "--output",
+        type=Path,
+        help="Write the deterministic statement to a file instead of stdout.",
+    )
 
     add_workflow_command_parsers(subparsers)
 
@@ -373,8 +413,77 @@ def main(argv: list[str] | None = None) -> int:
         print(f"OK: {args.response}")
         return 0
 
+    if args.command == "validate-policy-pack":
+        errors = validate_policy_pack_file(args.policy_pack)
+        if errors:
+            for error in errors:
+                print(f"ERROR: {error}")
+            return 1
+        print(f"OK: {args.policy_pack}")
+        return 0
+
+    if args.command == "evaluate-policy-pack":
+        try:
+            facts = json.loads(args.facts.read_text(encoding="utf-8"))
+            if not isinstance(facts, dict):
+                print("ERROR: facts must be a JSON object")
+                return 1
+            if args.preflight:
+                policy_pack = load_policy_pack(args.policy_pack)
+                pack_errors = validate_policy_pack_data(policy_pack)
+                if pack_errors:
+                    for error in pack_errors:
+                        print(f"ERROR: {error}")
+                    return 1
+                preflight_errors = policy_fact_preflight_errors(
+                    policy_pack,
+                    facts,
+                    agent_id=args.agent,
+                    ecosystem=args.ecosystem,
+                )
+                if preflight_errors:
+                    for error in preflight_errors:
+                        print(f"ERROR: {error}")
+                    return 1
+                evaluations = evaluate_policy_pack(
+                    policy_pack,
+                    facts,
+                    agent_id=args.agent,
+                    ecosystem=args.ecosystem,
+                )
+            else:
+                evaluations = evaluate_policy_pack_file(
+                    args.policy_pack,
+                    facts,
+                    agent_id=args.agent,
+                    ecosystem=args.ecosystem,
+                )
+        except PolicyPackLoadError as exc:
+            print(f"ERROR: policy_pack: {exc}")
+            return 1
+        except OSError as exc:
+            print(f"ERROR: {exc}")
+            return 1
+        except json.JSONDecodeError as exc:
+            print(f"ERROR: invalid JSON: {exc}")
+            return 1
+        except ValueError as exc:
+            print(f"ERROR: {exc}")
+            return 1
+        print(evaluations_to_json(evaluations), end="")
+        return 0
+
     if args.command == "structured-output-schema":
-        print(json.dumps(json_schema_for_agent(args.agent), indent=2, sort_keys=True))
+        output_fields = None
+        if args.task_profile:
+            try:
+                contract = compile_profile_contract(args.agent, args.task_profile)
+            except ValueError as exc:
+                print(f"ERROR: {exc}")
+                return 1
+            print(json.dumps(contract.provider_neutral_schema, indent=2))
+            return 0
+        print(json.dumps(json_schema_for_agent(args.agent, output_fields), indent=2))
         return 0
 
     if args.command == "verify-provenance":
@@ -443,7 +552,13 @@ def main(argv: list[str] | None = None) -> int:
         except (OSError, ValueError) as exc:
             print(f"ERROR: {exc}")
             return 1
-        print(json.dumps(statement, indent=2, sort_keys=True))
+        encoded = json.dumps(statement, indent=2, sort_keys=True) + "\n"
+        if args.output:
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(encoded, encoding="utf-8")
+            print(f"OK: {args.output}")
+        else:
+            print(encoded, end="")
         return 0
 
     workflow_result = run_workflow_command(args)
@@ -546,7 +661,8 @@ def _doctor_new_agent(recipe_path: Path) -> int:
     print(
         "git diff --exit-code -- README.md manifest.json .agents/plugins .claude-plugin "
         ".cursor-plugin agents assets claude-code claude-managed-agents codex cursor-sdk "
-        "gemini plugins portable skills"
+        "docs/model-recommendations.md gemini hooks model-recommendations.json plugins "
+        "portable skills"
     )
 
     if report.errors:

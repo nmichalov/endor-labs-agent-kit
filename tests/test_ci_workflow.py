@@ -22,6 +22,12 @@ def test_ci_workflow_runs_guardrail_conformance_check():
     assert "endor-agent-kit check-guardrails --catalog-root ." in workflow
 
 
+def test_ci_workflow_runs_registry_check_against_pinned_spec():
+    workflow = (repo_root() / ".github" / "workflows" / "agent-kit-ci.yml").read_text()
+
+    assert "python scripts/generate_endor_api_registry.py --check --spec source/endor-context/openapiv2.swagger.json" in workflow
+
+
 def test_ci_workflow_runs_endor_context_freshness_check():
     workflow = (repo_root() / ".github" / "workflows" / "agent-kit-ci.yml").read_text()
 
@@ -43,9 +49,47 @@ def test_refresh_endor_context_workflow_reports_manual_freshness():
     assert "schedule" in workflow
     assert "endor-agent-kit refresh-endor-context" in workflow
     assert "endor-agent-kit verify-endor-context --upstream" in workflow
+    assert "python scripts/generate_endor_api_registry.py --check --spec source/endor-context/openapiv2.swagger.json" in workflow
+    assert "source/endor-context/openapiv2.swagger.json" in workflow
     assert "Manual Endor context refresh needed" in workflow
     assert "contents: read" in workflow
     assert "pull-requests: write" not in workflow
     assert "gh pr create" not in workflow
     assert "git push" not in workflow
     assert "endor-context-refresh" not in workflow
+
+
+def test_ai_plugins_publication_validates_codex_directory_and_pins_source_provenance():
+    workflow = (
+        repo_root() / ".github" / "workflows" / "publish-ai-plugins-pr.yml"
+    ).read_text()
+
+    assert "provenance/agent-kit-manifest.json" in workflow
+    assert "provenance/agent-kit-source.json" in workflow
+    assert "build_codex_directory_submission.py validate --root ." in workflow
+
+
+def test_ai_plugins_publication_has_no_external_release_evidence_dependency() -> None:
+    workflow = (
+        repo_root() / ".github" / "workflows" / "publish-ai-plugins-pr.yml"
+    ).read_text()
+
+    assert "AGENT_QA_ACCEPTANCE_JSON" not in workflow
+    assert "ENDOR_AGENT_BACKEND_ACCEPTANCE_JSON" not in workflow
+    assert "scripts/validate_release_evidence.py" not in workflow
+
+
+def test_codex_directory_submission_workflow_requires_immutable_mirror_sha():
+    workflow = (
+        repo_root()
+        / "source"
+        / "distribution"
+        / "ai-plugins-workflows"
+        / "build-codex-directory-submission.yml"
+    ).read_text()
+
+    assert "ai_plugins_sha" in workflow
+    assert "^[0-9a-f]{40}$" in workflow
+    assert "git rev-parse HEAD" in workflow
+    assert "build_codex_directory_submission.py build" in workflow
+    assert "publish_release_assets" in workflow

@@ -27,7 +27,7 @@ copying portable policy facts.
 | Evidence before claims | Enforced in prompts and workflow validators | host contracts, portable runtime contract, output validators |
 | Namespace provenance and conflict surfacing | Enforced in prompts and setup guidance | shared prompt preflight, setup support files, catalog guardrails |
 | Endor Knowledge Pack rendering | Enforced in source and generated artifacts | `source/endor-knowledge-pack/`, shared renderer, catalog guardrails |
-| Endor upstream context freshness | Enforced in CI and release gates | `source/endor-context/provenance.json`, `verify-endor-context --upstream` |
+| Endor upstream context freshness | Enforced in CI and release gates | `source/endor-context/provenance.json`, `source/endor-context/openapiv2.swagger.json`, `verify-endor-context --upstream` |
 | Missing data handling | Enforced in prompts | required `data_gaps` behavior |
 | Output structure | Enforced for workflow gates | SCA and AI SAST validators/renderers/linters |
 | Portable runtime controls | Declared and tested | `agent.manifest.json`, `output-contract.md`, portable docs |
@@ -42,7 +42,7 @@ Every agent starts with a Source Recipe under `source/agents/<agent>/`.
 Recipes declare:
 
 - `safety_class`: `read_only`, `dry_run`, or `mutating`
-- `supported_transports`: MCP, `endorctl_api`, or direct API
+- `supported_transports`: MCP and the attributed `endorctl_agent_api` transport
 - `host_capabilities_required`: command execution, file reads, file writes, and change-request creation
 - `mutations`: the mutation types a mutating workflow may perform
 - `compatible_hosts`: the hosts intentionally published for that recipe
@@ -81,7 +81,7 @@ first behavior, `namespace_provenance`, and `data_gaps` guidance.
 Most current agents are read-only. The mutating workflows are:
 
 - `sca-remediation`
-- `ai-sast-triage`
+- `ai-sast-remediation`
 
 Read-only agents must not edit files, create change requests, run scans, dismiss
 findings, create policies, post comments, or mutate Endor Labs state. If a
@@ -100,7 +100,7 @@ Mutating agents use explicit action contracts for semantic side effects such as:
 - `ticket.create` when declared by a recipe
 
 `ticket.create` is part of the portable vocabulary. `sca-remediation` and
-`ai-sast-triage` declare it as an agent-owned action; other portable bundles
+`ai-sast-remediation` declare it as an agent-owned action; other portable bundles
 can use it as a runtime wrapper after final output.
 
 ## Endor Namespace Guardrails
@@ -111,8 +111,11 @@ Endor lookup. The valid namespace sources are the current user request, the
 current process `ENDOR_NAMESPACE`, the `ENDOR_NAMESPACE` key from the default
 `~/.endorctl/config.yaml`, or already-resolved Endor project metadata.
 
-Environment-variable auth remains supported. Agents and setup workflows may use
-`ENDOR_NAMESPACE` and `ENDOR_API_CREDENTIALS_*`, but they must not silently
+The namespace selects tenant scope; it is not authentication proof. `endorctl`
+may consume its default config internally, and environment-variable auth remains
+supported. Agents and setup workflows may use `ENDOR_NAMESPACE` and
+`ENDOR_API_CREDENTIALS_*`, but they must not open or parse credential fields
+into model context and must not silently
 trust a namespace when the process environment and default config disagree. If
 both namespace values exist and differ, generated guidance requires surfacing
 both values with provenance and stopping for user confirmation before scoped
@@ -121,8 +124,11 @@ Endor or Endor MCP lookups.
 Generated setup and workflow guidance must not read, cat, source, recurse
 through, or point `ENDORCTL_CONFIG` or `--config-path` at tenant-specific,
 customer-specific, production, backup, or other non-default Endor config
-directories. When a namespace is selected, scoped `endorctl api` lookups must
+directories. When a namespace is selected, scoped `endorctl agent api --agent-id <agent-id>` lookups must
 pass it explicitly with `-n <namespace>` or `--namespace <namespace>`.
+Successful current-run Endor evidence proves authentication. Authentication
+failures must be redacted and recorded as data gaps; generated guidance must
+not ask users to paste config files, tokens, or secrets.
 
 ## Host Guardrails
 
@@ -194,7 +200,7 @@ Antigravity-specific wording.
 
 The Antigravity plugin package declares root `plugin.json`, skills, subagents,
 and minimal assets. It does not declare plugin-wide MCP by default. Setup keeps
-`antigravity plugin validate`, install, enable/disable, and uninstall steps
+`agy plugin validate`, install, enable/disable, and uninstall steps
 explicit and evidence-backed. If Antigravity subagent delegation is unavailable,
 the matching skill remains the fallback and the agent must report the
 limitation.
@@ -205,17 +211,19 @@ API secrets.
 
 ### Cursor
 
-Cursor package artifacts include generated root agents, generated root support
-skills, and a host contract that preserves the same recipe safety posture as
-the source recipe.
+Cursor package artifacts include generated agents, generated support skills,
+and a host contract that preserves the same recipe safety posture as the source
+recipe.
 
-The Cursor package declares `.cursor-plugin/` metadata, root generated
-`agents/`, root generated `skills/`, root advisory `hooks/`, and
-`assets/logo.png`. It does not declare plugin-wide MCP by default and does not
-use Gemini extension files. Setup keeps install, update, and uninstall steps
-explicit and evidence-backed. Cursor agents are the customer-facing workflow
-entry points; matching skills remain bundled support material and fallback
-workflow reference.
+The Agent Kit source package declares `.cursor-plugin/` metadata, root
+generated `agents/`, root generated `skills/`, root advisory `hooks/`, and
+`assets/logo.png`. Mirror sync converts that payload into the conventional
+self-contained `plugins/cursor/endor-labs-agent-kit/` package, including the
+source-approved MCP declaration as `mcp.json`. It does not use Gemini extension
+files. Setup keeps install, update, and uninstall steps explicit and
+evidence-backed. Cursor agents are the customer-facing workflow entry points;
+matching skills remain bundled support material and fallback workflow
+reference.
 
 Cursor package setup must not run scans, run `endorctl host-check`, edit shell
 profiles, auto-install `gh`, install language tooling, or collect/write API
@@ -317,8 +325,10 @@ regenerate the catalog.
 
 `source/endor-context/provenance.json` records the public Endor OpenAPI SHA,
 the warning-only `/meta/version` signal, and selected canonical Endor docs URLs
-used by Agent Kit prompts and release documentation. It is a maintainer
-freshness gate, not runtime agent context.
+used by Agent Kit prompts and release documentation. The matching
+`source/endor-context/openapiv2.swagger.json` is checked in so CI can validate
+registry and field references offline against the pinned spec. These files are
+a maintainer freshness gate, not runtime agent context.
 
 `endor-agent-kit verify-endor-context --upstream` compares the committed
 OpenAPI SHA and docs URLs against live upstream sources. OpenAPI drift and docs

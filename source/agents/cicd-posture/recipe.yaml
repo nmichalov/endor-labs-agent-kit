@@ -1,28 +1,34 @@
 recipe_schema_version: 1
 id: cicd-posture
 name: CI/CD And Supply Chain Posture
+category: Compliance
 version: 0.1.0
 description: |
-  Use this agent when the user wants a read-only CI/CD and supply chain
-  posture assessment for an Endor namespace, GitHub organization, repository
-  set, or current repository. The agent combines existing Endor SCPM, CI/CD,
-  GitHub Actions, and supply-chain findings with read-only GitHub configuration
-  evidence and optional local CI file inspection, then returns deterministic
-  scores, critical overrides, evidence queries, and data gaps without mutating
-  Endor, GitHub, or repository state.
+  Assesses CI/CD and software supply-chain security across an Endor namespace,
+  GitHub organization, selected repositories, or the current repository. It
+  combines existing Endor SCPM, CI/CD, GitHub Actions, and supply-chain
+  findings with read-only repository configuration evidence and optional local
+  CI inspection to produce deterministic scores, critical overrides,
+  prioritized improvements, and explicit data gaps. It does not modify Endor,
+  GitHub, or repository state.
 audience: appsec
-short_description: "A read-only CI/CD and supply-chain posture assessment for a namespace, organization, or repository set."
+short_description: "Scores CI/CD and supply-chain posture from read-only Endor and repository evidence."
 authors: ["Endor Labs"]
 safety_class: read_only
 endor_tier_minimum: enterprise
+policy_pack_support: true
 supported_transports:
-  - endorctl_api
+  - endorctl_agent_api
 host_capabilities_required:
   run_commands: true
   read_files: true
   write_files: false
   open_pr: false
 inputs:
+  - name: policy_pack
+    kind: object
+    required: false
+    description: Optional trusted Agent Policy Pack context supplied by runtime or protected workspace configuration.
   - name: namespace
     kind: string
     required: false
@@ -116,6 +122,14 @@ outputs:
     kind: list[string]
     required: true
     description: Missing namespace, Endor category, GitHub permission, repository inventory, branch protection, workflow, runner, CODEOWNERS, update automation, or local CI evidence.
+  - name: policy_context
+    kind: object
+    required: true
+    description: Trusted policy pack status, id, version, SHA-256, and source. Use not_configured when no policy pack is active.
+  - name: policy_evaluations
+    kind: list[object]
+    required: true
+    description: Applicable policy decisions with policy id, effect, decision, message, facts used, and missing facts.
 evals: evals/cases.yaml
 compatible_hosts:
   - claude-code
@@ -132,7 +146,7 @@ host_editions:
     - enterprise-edition
 mutations: []
 required_endor_mcp_tools: []
-endorctl_api_invocations:
+endorctl_agent_api_invocations:
   - list_cicd_supply_chain_findings
   - resolve_project_or_repository_selector
   - list_endor_projects
@@ -140,4 +154,4 @@ endorctl_api_invocations:
 instructions_path: instructions.md
 model: sonnet
 requires_endor_mcp: ""
-requires_endorctl: ">=1.0.0"
+requires_endorctl: ">=1.7.1088"

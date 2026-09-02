@@ -21,6 +21,18 @@ This is the Claude Managed Agents generated agent for `ai-sast-dynamic-validatio
 | Agent installer | Copy the generated files exactly, including the generated prompt or skill file, `endorctl-setup.md`, `architecture.svg`. Do not summarize or rewrite the generated prompt. |
 | Maintainer | Change `source/agents/ai-sast-dynamic-validation/recipe.yaml`, `instructions.md`, evals, action contracts, or `architecture.svg`, then regenerate the catalog. Do not hand-edit generated copies. |
 
+## Recommended Model
+
+This is a release-QA target, not a requirement or model allowlist.
+Agent Kit does not block compatible customer-selected host models.
+
+- Recommended model: `sonnet`.
+- Selection mode: `pinned`.
+- Recommended reasoning/effort: `host default pending tier validation`.
+- Generated behavior: recipe sonnet alias compiles to claude-sonnet-4-6.
+- Override behavior: managed host configuration remains authoritative.
+- Provider guidance: <https://code.claude.com/docs/en/sub-agents>.
+
 ## Install
 
 Update placeholders in `agent.yaml`, `environment.yaml`, and
@@ -54,6 +66,6 @@ This diagram shows the generated agent contract, host responsibilities, and exte
 
 ## Notes
 
-- This agent uses read-only endorctl api lookups and does not require Endor MCP.
+- This agent uses read-only `endorctl agent api --agent-id ai-sast-dynamic-validation` lookups and does not require Endor MCP.
 - The generated `agent.yaml` enables only the Managed Agents Bash tool from the pre-built toolset, with confirmation required.
 - Bash use remains limited by prompt to the documented Endor lookup commands.

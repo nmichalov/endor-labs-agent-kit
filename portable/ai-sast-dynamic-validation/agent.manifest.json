@@ -4,6 +4,7 @@
     "actions": null,
     "agent": "agent.md",
     "architecture": "architecture.svg",
+    "artifact_summarizer": "runtime/summarize_endor_artifact.py",
     "output_contract": "output-contract.md",
     "runtime_contract": "agent.manifest.json",
     "runtime_setup": "endorctl-setup.md"
@@ -16,11 +17,7 @@
     "supports_plan_only": true
   },
   "description": "Use this agent when the user wants to confirm whether Endor AI SAST findings\nare actually exploitable by safely replaying each finding's non-destructive\nExploit Reproduction proof-of-concept against a running instance of the\ntarget web app. The agent parses Endor's AI SAST case file, statically lints\nthe embedded proof-of-concept for destructive patterns, retargets it to a\nuser-authorized base URL only, executes bounded read-only probes, and\nclassifies each finding as dynamically confirmed, not reproducible, blocked\nby a control, or inconclusive. It never mutates the repository, the Endor\ntenant, or the target application, and it never sends a single request\nwithout explicit current-turn authorization.\n",
-  "endorctl_api_invocations": [
-    "resolve_project_from_repository",
-    "list_ai_sast_findings",
-    "get_finding_explanation"
-  ],
+  "endorctl_agent_api_invocations": [],
   "generated_files_are_editable": false,
   "id": "ai-sast-dynamic-validation",
   "inputs": [
@@ -213,6 +210,14 @@
       ]
     },
     {
+      "description": "Load trusted policy packs, return policy evaluation evidence, and deny mutating actions when policies block or require unverified review.",
+      "id": "policy_enforcement",
+      "required_for": [
+        "policy_actions",
+        "mutating_actions"
+      ]
+    },
+    {
       "description": "Perform duplicate-prevention lookups before creating or reusing external state when an action contract requires it.",
       "id": "idempotency_check",
       "required_for": [
@@ -232,8 +237,7 @@
       "description": "Run read-only Endor evidence lookups through an approved Endor transport.",
       "kind": "endor.query",
       "provider_examples": [
-        "endor-api",
-        "endorctl-api",
+        "endorctl-agent-api",
         "approved-endor-mcp-adapter"
       ],
       "status": "declared"
@@ -328,11 +332,22 @@
     {
       "confirmation_required": null,
       "declared_by_recipe": false,
-      "description": "Create or reuse an Endor policy only after required approval and confirmation.",
+      "description": "Evaluate trusted organization policy packs before recommendations or mutating workflow gates proceed.",
+      "kind": "organization.policy.evaluate",
+      "provider_examples": [
+        "policy-pack",
+        "policy-service",
+        "runtime-policy-engine"
+      ],
+      "status": "unavailable"
+    },
+    {
+      "confirmation_required": null,
+      "declared_by_recipe": false,
+      "description": "Create, update, or reuse an Endor Policy only after required approval and confirmation; delete and non-Policy mutations are forbidden.",
       "kind": "endor.policy.write",
       "provider_examples": [
-        "endor-api",
-        "endorctl-api"
+        "endorctl-agent-api"
       ],
       "status": "unavailable"
     },

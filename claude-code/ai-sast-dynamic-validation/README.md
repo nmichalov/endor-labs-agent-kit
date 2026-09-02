@@ -21,6 +21,18 @@ This is the Claude Code generated agent for `ai-sast-dynamic-validation`.
 | Agent installer | Copy the generated files exactly, including the generated prompt or skill file, `endorctl-setup.md`, `architecture.svg`. Do not summarize or rewrite the generated prompt. |
 | Maintainer | Change `source/agents/ai-sast-dynamic-validation/recipe.yaml`, `instructions.md`, evals, action contracts, or `architecture.svg`, then regenerate the catalog. Do not hand-edit generated copies. |
 
+## Recommended Model
+
+This is a release-QA target, not a requirement or model allowlist.
+Agent Kit does not block compatible customer-selected host models.
+
+- Recommended model: `sonnet`.
+- Selection mode: `pinned`.
+- Recommended reasoning/effort: `host default pending tier validation`.
+- Generated behavior: agent frontmatter defaults to sonnet.
+- Override behavior: Claude environment or per-invocation subagent override wins.
+- Provider guidance: <https://code.claude.com/docs/en/sub-agents>.
+
 ## Install
 
 Copy `ai-sast-dynamic-validation.md` into your target repository's `.claude/agents/` directory,
@@ -45,5 +57,5 @@ This diagram shows the generated agent contract, host responsibilities, and exte
 
 ## Notes
 
-- This agent uses read-only endorctl api lookups and does not require Endor MCP.
+- This agent uses read-only `endorctl agent api --agent-id ai-sast-dynamic-validation` lookups and does not require Endor MCP.
 - Bash use is limited by prompt to the documented Endor lookup commands.

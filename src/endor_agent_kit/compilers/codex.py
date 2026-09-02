@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 from textwrap import dedent
+import unicodedata
 
 from endor_agent_kit.compilers.rendering import (
     indent,
@@ -49,6 +51,9 @@ def render_codex_skill(
     compact_plugin: bool = False,
     package_name: str | None = None,
     package_version: str | None = None,
+    artifact_summarizer_command: str | None = None,
+    artifact_summarizer_guidance: str | None = None,
+    normalized_frontmatter: bool = False,
 ) -> str:
     """Render a Codex skill from a prepared Source Recipe."""
 
@@ -60,6 +65,9 @@ def render_codex_skill(
         compact_plugin=compact_plugin,
         package_name=package_name,
         package_version=package_version,
+        artifact_summarizer_command=artifact_summarizer_command,
+        artifact_summarizer_guidance=artifact_summarizer_guidance,
+        normalized_frontmatter=normalized_frontmatter,
     )
 
 
@@ -72,6 +80,9 @@ def _render_skill(
     compact_plugin: bool = False,
     package_name: str | None = None,
     package_version: str | None = None,
+    artifact_summarizer_command: str | None = None,
+    artifact_summarizer_guidance: str | None = None,
+    normalized_frontmatter: bool = False,
 ) -> str:
     body = _codex_instruction_text(
         instructions_for_edition(
@@ -80,27 +91,52 @@ def _render_skill(
             recipe_id=recipe.id,
             structured_output_recipe=recipe,
             compact_plugin=compact_plugin,
-        )
+        ),
+        artifact_summarizer_command=artifact_summarizer_command,
     )
-    action_contracts = _codex_instruction_text(render_action_contracts(actions, compact=compact_plugin))
-    host_contract = _codex_host_contract(recipe, compact=compact_plugin)
+    action_contracts = _codex_instruction_text(
+        render_action_contracts(actions, compact=compact_plugin),
+        artifact_summarizer_command=artifact_summarizer_command,
+    )
+    host_contract = _codex_host_contract(
+        recipe,
+        compact=compact_plugin,
+        artifact_summarizer_guidance=artifact_summarizer_guidance,
+    )
     notice = _codex_notice(
         recipe,
         generated_context=generated_context,
         package_name=package_name,
         package_version=package_version,
     )
+    if normalized_frontmatter:
+        rendered_description = (
+            "description: "
+            + json.dumps(
+                _normalize_frontmatter_text(recipe.description),
+                ensure_ascii=False,
+            )
+            + "\n"
+        )
+    else:
+        rendered_description = (
+            "description: |\n"
+            f"{indent(recipe.description.strip(), 2)}\n"
+        )
     return (
         "---\n"
         f"name: {recipe.id}\n"
-        "description: |\n"
-        f"{indent(recipe.description.strip(), 2)}\n"
+        f"{rendered_description}"
         "---\n\n"
         f"{notice}\n\n"
         f"{host_contract}\n\n"
         f"{body.rstrip()}\n"
         f"{action_contracts}"
     )
+
+
+def _normalize_frontmatter_text(value: str) -> str:
+    return " ".join(unicodedata.normalize("NFKC", value).strip().split())
 
 
 def _codex_notice(
@@ -130,7 +166,12 @@ def _codex_notice(
     return "\n".join(lines)
 
 
-def _codex_host_contract(recipe: EndorAgentRecipe, *, compact: bool = False) -> str:
+def _codex_host_contract(
+    recipe: EndorAgentRecipe,
+    *,
+    compact: bool = False,
+    artifact_summarizer_guidance: str | None = None,
+) -> str:
     posture = source_recipe_safety_posture(recipe)
     if compact:
         lines = [
@@ -162,6 +203,8 @@ def _codex_host_contract(recipe: EndorAgentRecipe, *, compact: bool = False) -> 
             lines.append("- Do not write source files for this workflow.")
         if not posture.can_open_change_requests:
             lines.append("- Do not create branches, commits, pushes, PRs, or MRs for this workflow.")
+        if artifact_summarizer_guidance:
+            lines.append(f"- {artifact_summarizer_guidance}")
         return "\n".join(lines)
 
     lines = [
@@ -201,12 +244,22 @@ def _codex_host_contract(recipe: EndorAgentRecipe, *, compact: bool = False) -> 
     return "\n".join(lines)
 
 
-def _codex_instruction_text(text: str) -> str:
+def _codex_instruction_text(
+    text: str,
+    *,
+    artifact_summarizer_command: str | None = None,
+) -> str:
     """Adapt source host wording for Codex while preserving recipe semantics."""
 
-    return (
+    rendered = (
         text.replace("Claude Code session", "Codex session")
         .replace("Claude Code artifact", "Codex skill")
         .replace("Claude Code workspace", "Codex workspace")
         .replace("Claude Code", "Codex")
     )
+    if artifact_summarizer_command:
+        rendered = rendered.replace(
+            "python3 runtime/summarize_endor_artifact.py",
+            artifact_summarizer_command,
+        )
+    return rendered
